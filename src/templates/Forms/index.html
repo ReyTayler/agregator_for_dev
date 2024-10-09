@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Forms</title>
+    <link href="style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <form method="post">
+        <h2>{{name}}, заполните анкету для поступления в {{university}}</h2>
+
+        <label for="name_id">Ваше имя:</label>
+        <input type="text" name="name" id="name_id">
+
+        <label for="stud_email_id">Ваш email:</label>
+        <input type="email" name="stud_email" id="stud_email_id">
+
+        <label for="stud_pass_id">Придумайте пароль от вашего личного кабинета:</label>
+        <input type="password" name="stud_pass" id="stud_pass_id">
+
+        <h2>Информация о вас</h2>
+
+        <label for="biography_id">Расскажите о себе:</label>
+        <textarea name="biography" cols="100" rows="8" id="biography_id"></textarea>
+
+        <label>Выберете предпочитаемое направление обучения:</label>
+        <select id="stud_courses_id" name="stud_courses">
+            <option selected disabled>Выберете направление:</option>
+            <optgroup label="Программирование">
+                <option value="int_info_sys">Интеллектуальные информационные системы</option>
+                <option value="pmi">Прикладная математика и информатика</option>
+                <option value="ML_DL_Neuro">Машинное и глубокое обучение нейросетей</option>
+            </optgroup>
+            <optgroup label="Коммуникационные системы">
+                <option value="infocom_sys_web">Инфокоммуникационные системы и сети</option>
+            </optgroup>
+        </select>
+
+        <h3>Ваше образование:</h3>
+        <input type="radio" id="midl_not_finish_id" name="education" value="class_9"><label for="midl_not_finish_id" class="radiobutton">9 классов</label><br>
+        <input type="radio" id="midl_finish_id" name="education" value="class_11"><label for="midl_finish_id" class="radiobutton">11 классов</label><br>
+
+
+        <button type="submit" name="button_submit">Отправить</button>
+    </form>
+</body>
+</html>
