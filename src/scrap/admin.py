@@ -3,11 +3,11 @@ from .models import City, Lang, Vacancy
 
 
 class CityAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "slug")
+    list_display = ("name", "slug")
 
 
 class LangAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "slug")
+    list_display = ("name", "slug")
 
 
 admin.site.register(City, CityAdmin)
