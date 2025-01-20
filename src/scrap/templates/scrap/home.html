@@ -15,4 +15,12 @@
     </div>
 </div>
 {% endfor %}
+<div class="row">
+    <div class="col-sm-5 mx-auto">
+        <form action="" method="get">
+            {{form.as_p}}
+            <button type="submit" class="btn btn-primary btn-lg btn-block">Поиск</button>
+        </form>
+    </div>
+</div>
 {% endblock content %}
