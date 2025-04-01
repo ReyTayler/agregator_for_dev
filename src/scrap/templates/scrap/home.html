@@ -5,8 +5,9 @@
 {% block content %}
 {% for object in object_list %}
 <div class="card my-3">
-    <h5 class="card-header">{{object.title}}</h5>
+    <h4 class="card-header">{{object.title}}</h4>
     <div class="card-body">
+        <h5>{{object.company}}</h5>
         <p class="card-text">{{object.description}}</p>
         <a href="{{object.url}}" target="_blank" class="btn btn-primary">Подробнее</a>
     </div>
@@ -14,6 +15,8 @@
         {{object.city}} | {{object.language}} | {{object.timestamp}}
     </div>
 </div>
+{% empty %}
+    <h4 class="my-4 text-center">Вакансии по Вашему запросу не найдены!</h4>
 {% endfor %}
 <div class="row">
     <div class="col-sm-5 mx-auto">
