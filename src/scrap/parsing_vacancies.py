@@ -26,7 +26,7 @@ jobs_info = []
 errors_info = []
 
 
-def get_vacancies_habr(url_page: str):
+def get_vacancies_habr(url_page: str, city=None, language=None):
     global jobs_info
     global errors_info
 
@@ -51,32 +51,31 @@ def get_vacancies_habr(url_page: str):
                     "title": title,
                     "url": domain_habr_career + href,
                     "company": company,
-                    "description": "Краткое описание не было предоставлено..."
+                    "description": "Краткое описание не было предоставлено...",
+                    "city_id": city,
+                    "language_id": language
                 }
 
                 jobs_info.append(job)
 
         else:
             error = {
-                "Нет вакансий!": {
-                    "title": "Поиск не дал результатов",
-                    "url": url_page,
-                    "description": "Попробуйте изменить условия поиска",
-                }
+                "title": "Поиск не дал результатов",
+                "url": url_page,
+                "description": "Попробуйте изменить условия поиска",
             }
 
             errors_info.append(error)
     else:
         error = {
-            "Запрос выполнен с ошибкой!": {
-                "url": url_page,
-                "status_code": response.status_code,
-            }
+            "url": url_page,
+            "status_code": response.status_code,
         }
+
         errors_info.append(error)
 
 
-def get_vacancies_getmatch(url_page: str):
+def get_vacancies_getmatch(url_page: str, city=None, language=None):
     global jobs_info
     global errors_info
 
@@ -108,38 +107,33 @@ def get_vacancies_getmatch(url_page: str):
                     "title": title,
                     "url": domain_getmatch + href,
                     "company": company,
-                    "description": main_text
+                    "description": main_text,
+                    "city_id": city,
+                    "language_id": language
                 }
 
                 jobs_info.append(job)
 
         else:
             error = {
-                "Нет вакансий!": {
-                    "title": "По такому запросу мы не нашли удовлетворяющих результатов.",
-                    "url": url_page,
-                }
+                "title": "По такому запросу мы не нашли удовлетворяющих результатов.",
+                "url": url_page,
             }
 
             errors_info.append(error)
     else:
         error = {
-            "Запрос выполнен с ошибкой!": {
-                "url": url_page,
-                "status_code": response.status_code,
-            }
+            "url": url_page,
+            "status_code": response.status_code,
         }
+
         errors_info.append(error)
 
 
-def get_vacancies_hh(
-        keyword: str = None, salary_from: int = None, only_with_salary=False, area: int = None
-):
+def get_vacancies_hh(keyword: str = None, area: int = None, city=None, language=None):
     params_api = {
         "text": keyword,
-        "salary": salary_from,
-        "only_with_salary": only_with_salary,
-        "per_page": 100,
+        "per_page": 40,
         "area": area
     }
 
@@ -160,17 +154,25 @@ def get_vacancies_hh(
                 url = vacancy["alternate_url"]
                 description = vacancy['snippet']['responsibility']
 
-                job = {"title": title, "url": url, "company": company, "description": description}
+                job = {
+                    "title": title,
+                    "url": url,
+                    "company": company,
+                    "description": description,
+                    "city_id": city,
+                    "language_id": language
+                }
 
                 jobs_info.append(job)
         else:
             error = {
-                "Нет вакансий!": {
-                    "title": "Поиск не дал результатов",
-                    "description": "Попробуйте изменить условия поиска",
-                }
+                "title": "Поиск не дал результатов",
+                "description": "Попробуйте изменить условия поиска",
             }
+
             errors_info.append(error)
     else:
-        error = {"Запрос выполнен с ошибкой!": {"status_code": response.status_code}}
+        error = {
+            "status_code": response.status_code
+        }
         errors_info.append(error)
