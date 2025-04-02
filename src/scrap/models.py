@@ -2,6 +2,14 @@ from django.db import models
 from pytils.translit import slugify
 
 
+def default_url():
+    return {
+        "getmatch": "",
+        "habr": "",
+        "hh": {"keyword": "", "area": None}
+    }
+
+
 class City(models.Model):
     name = models.CharField(max_length=40, verbose_name="Название города", unique=True)
     slug = models.CharField(max_length=12, blank=True, unique=True)
@@ -47,3 +55,20 @@ class Vacancy(models.Model):
     class Meta:
         verbose_name = "Вакансия"
         verbose_name_plural = "Вакансии"
+        ordering = ["-timestamp"]
+
+
+class Error(models.Model):
+    timestamp = models.DateField(auto_now_add=True)
+    description_error = models.JSONField()
+
+
+class Url(models.Model):
+    city = models.ForeignKey("City", on_delete=models.CASCADE, verbose_name="Город")
+    language = models.ForeignKey("Lang", on_delete=models.CASCADE, verbose_name="Язык программирования")
+
+    urls = models.JSONField(default=default_url)
+
+    class Meta:
+        # Комбинации полей city и language должные быть всегда уникальными для каждой записи таблицы
+        unique_together = ("city", "language")
