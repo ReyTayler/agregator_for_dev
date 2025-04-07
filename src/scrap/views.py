@@ -1,11 +1,15 @@
 from django.shortcuts import render
 from django.http import HttpRequest
-from .models import Vacancy, City
+from .models import Vacancy
 from .forms import FindVacancyForm
 
 
 def main_view(request: HttpRequest):
-    print(request.GET)
+    form = FindVacancyForm()
+    return render(request=request, template_name='scrap/main.html', context={"form": form})
+
+
+def vacancies_list_view(request: HttpRequest):
     city = request.GET.get('city')
     lang = request.GET.get('lang')
 
@@ -21,6 +25,6 @@ def main_view(request: HttpRequest):
         vacancies = Vacancy.objects.filter(**filter_for_vacancy)
 
     return render(request=request,
-                  template_name='scrap/home.html',
+                  template_name='scrap/vacancies.html',
                   context={"object_list": vacancies,
                            "form": form})
