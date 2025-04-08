@@ -1,27 +1,60 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock title %}
 {% block content %}
-    {% for object in object_list %}
-        <div class="card my-3">
-            <h4 class="card-header">{{object.title}}</h4>
-                <div class="card-body">
-                    <h5>{{object.company}}</h5>
-                    <p class="card-text">{{object.description}}</p>
-                    <a href="{{object.url}}" target="_blank" class="btn btn-primary">Подробнее</a>
-                </div>
-                <div class="card-footer text-muted text-center">
-                    {{object.city}} | {{object.language}} | {{object.timestamp}}
-                </div>
+{% for object in object_list %}
+    <div class="card my-3">
+        <h4 class="card-header">{{object.title}}</h4>
+        <div class="card-body">
+            <h5>{{object.company}}</h5>
+            <p class="card-text">{{object.description}}</p>
+            <a href="{{object.url}}" target="_blank" class="btn btn-primary">Подробнее</a>
         </div>
-        {% empty %}
-            <h4 class="my-4 text-center">Вакансии по Вашему запросу не найдены!</h4>
-    {% endfor %}
-    <div class="row">
-        <div class="col-sm-5 mx-auto">
-            <form class="p-4 p-md-4 border rounded-3 bg-body-tertiary" action="" method="GET">
-                {{form.as_p}}
-                <button type="submit" class="btn btn-lg btn-primary w-100">Повторить поиск</button>
-            </form>
+        <div class="card-footer text-muted text-center">
+            {{object.city}} | {{object.language}} | {{object.timestamp}}
         </div>
     </div>
+{% empty %}
+    <h4 class="my-4 text-center">Вакансии по Вашему запросу не найдены!</h4>
+{% endfor %}
+
+{% if object_list %}
+    <nav aria-label="...">
+        <ul class="pagination justify-content-center pagination-lg">
+            {% if object_list.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ object_list.previous_page_number }}&city={{ city }}&lang={{ lang }}">Предыдущая</a>
+                </li>
+            {% endif %}
+
+            {% for page_number in object_list.paginator.page_range %}
+                {% if object_list.number == page_number %}
+                    <li class="page-item active" aria-current="page">
+                        <span class="page-link">{{ page_number }}</span>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_number }}&city={{ city }}&lang={{ lang }}">{{ page_number }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if object_list.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ object_list.next_page_number }}&city={{ city }}&lang={{ lang }}">Следующая</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endif %}
+
+<div class="row py-4">
+    <div class="col-sm-5 mx-auto">
+        <form class="p-4 p-md-4 border rounded-3 bg-body-tertiary" action="" method="GET">
+            {{form.as_p}}
+            <button type="submit" class="btn btn-lg btn-primary w-100">Повторить поиск</button>
+        </form>
+    </div>
+</div>
+
 {% endblock content %}
