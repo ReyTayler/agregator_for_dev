@@ -1,60 +1,98 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock title %}
+{% block title %}Вакансии{% endblock title %}
+
 {% block content %}
-{% for object in object_list %}
-    <div class="card my-3">
-        <h4 class="card-header">{{object.title}}</h4>
-        <div class="card-body">
-            <h5>{{object.company}}</h5>
-            <p class="card-text">{{object.description}}</p>
-            <a href="{{object.url}}" target="_blank" class="btn btn-primary">Подробнее</a>
-        </div>
-        <div class="card-footer text-muted text-center">
-            {{object.city}} | {{object.language}} | {{object.timestamp}}
-        </div>
-    </div>
-{% empty %}
-    <h4 class="my-4 text-center">Вакансии по Вашему запросу не найдены!</h4>
-{% endfor %}
+<div class="container py-4">
 
-{% if object_list %}
-    <nav aria-label="...">
-        <ul class="pagination justify-content-center pagination-lg">
-            {% if object_list.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ object_list.previous_page_number }}&city={{ city }}&lang={{ lang }}">Предыдущая</a>
-                </li>
-            {% endif %}
+    {% for object in object_list %}
+        <div class="card mb-4 shadow-sm border-0 rounded-4">
+            <div class="card-header bg-primary bg-gradient text-white d-flex justify-content-between align-items-center rounded-top-4">
+                <h5 class="mb-0 text-wrap">
+                    <a href="{{ object.url }}" target="_blank" class="text-white text-decoration-none">{{ object.title }}</a>
+                </h5>
+                <small class="text-light">{{ object.timestamp|date:"d.m.Y" }}</small>
+            </div>
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">
+                    <i class="bi bi-building me-1"></i>{{ object.company }}
+                </h6>
+                <p class="card-text">{{ object.description|truncatewords:40 }}</p>
+                <a href="{{ object.url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                    Подробнее <i class="bi bi-box-arrow-up-right ms-1"></i>
+                </a>
+            </div>
+            <div class="card-footer text-muted text-end small fst-italic rounded-bottom-4">
+                <i class="bi bi-geo-alt-fill me-1"></i>{{ object.city }} •
+                <i class="bi bi-code-slash me-1"></i>{{ object.language }}
+            </div>
+        </div>
+    {% empty %}
+        <div class="alert alert-warning text-center">
+            <strong>Нет результатов.</strong> Вакансии по вашему запросу не найдены!
+        </div>
+    {% endfor %}
 
-            {% for page_number in object_list.paginator.page_range %}
-                {% if object_list.number == page_number %}
-                    <li class="page-item active" aria-current="page">
-                        <span class="page-link">{{ page_number }}</span>
-                    </li>
-                {% else %}
+    {% if object_list %}
+        <nav aria-label="Пагинация">
+            <ul class="pagination justify-content-center mt-4">
+                {% if object_list.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ page_number }}&city={{ city }}&lang={{ lang }}">{{ page_number }}</a>
+                        <a class="page-link" aria-label="Предыдущая" href="?page={{ object_list.previous_page_number }}&city={{ city }}&lang={{ lang }}">
+                            &laquo;
+                        </a>
                     </li>
                 {% endif %}
-            {% endfor %}
 
-            {% if object_list.has_next %}
-                <li class="page-item">
-                    <a class="page-link"
-                       href="?page={{ object_list.next_page_number }}&city={{ city }}&lang={{ lang }}">Следующая</a>
-                </li>
-            {% endif %}
-        </ul>
-    </nav>
-{% endif %}
+                {% for page_number in object_list.paginator.page_range %}
+                    {% if object_list.number == page_number %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_number }}</span>
+                        </li>
+                    {% elif page_number >= object_list.number|add:'-2' and page_number <= object_list.number|add:'2' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_number }}&city={{ city }}&lang={{ lang }}">{{ page_number }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
 
-<div class="row py-4">
-    <div class="col-sm-5 mx-auto">
-        <form class="p-4 p-md-4 border rounded-3 bg-body-tertiary" action="" method="GET">
-            {{form.as_p}}
-            <button type="submit" class="btn btn-lg btn-primary w-100">Повторить поиск</button>
-        </form>
+                {% if object_list.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" aria-label="Следующая" href="?page={{ object_list.next_page_number }}&city={{ city }}&lang={{ lang }}">
+                            &raquo;
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+
+    <div class="row justify-content-center mt-5">
+  <div class="col-md-6">
+    <div class="border p-4 rounded-4 shadow-sm bg-body-tertiary">
+      <h5 class="mb-3 text-center">
+        <i class="bi bi-funnel-fill me-2"></i>Изменить параметры поиска
+      </h5>
+      <form method="GET" action="">
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-search me-1"></i>Повторить поиск
+        </button>
+      </form>
     </div>
+  </div>
 </div>
 
+
+</div>
+
+<style>
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+</style>
 {% endblock content %}

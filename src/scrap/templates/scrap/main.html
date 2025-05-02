@@ -1,22 +1,35 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock title %}
+{% block title %}Главная{% endblock title %}
+
 {% block content %}
 <div class="row align-items-center g-lg-5 py-5">
-    <div class="col-lg-7 text-center text-lg-start">
-        <h1 class="display-4 fw-bold lh-1 text-body-emphasis mb-3">Добро пожаловать в лучший агрегатор вакансий для
-            программистов.</h1>
-        <p class="col-lg-10 fs-4">Здесь собраны все актуальные вакансии для разработчиков со всех городов России. Мы
-            предоставляем свежие вакансии, размещаемые в сервисах HeadHunter, GetMatch, Хабр.Карьера и многих
-            других.<br> От вас останется указать лишь предпочтительный город для поиска (или Удалёнку) и ваш основной
-            инструмент разработки. Всё остальное предоставьте нашей команде❤</p>
-    </div>
-    <div class="col-md-10 mx-auto col-lg-5">
-        <form class="p-4 p-md-5 border rounded-3 bg-body-tertiary" action="{% url 'vacancies' %}" method="GET">
-            {{form.as_p}}
-            <button class="w-100 btn btn-lg btn-primary" type="submit">Подобрать вакансии</button>
-            <hr class="my-4">
-            <small class="text-body-secondary">Это тестовый проект, все права <b>защищены</b>.</small>
-        </form>
-    </div>
+  <div class="col-lg-7 text-center text-lg-start">
+    <h1 class="display-4 fw-bold lh-1 text-body-emphasis mb-3 animate__animated animate__fadeInLeft">
+      Добро пожаловать в лучший агрегатор вакансий для программистов.
+    </h1>
+    <p class="col-lg-10 fs-5 text-body">
+      Здесь собраны все актуальные вакансии для разработчиков со всех городов России.
+      Мы предоставляем свежие вакансии, размещаемые в сервисах HeadHunter, GetMatch, Хабр.Карьера и других.<br>
+      Просто выберите предпочтительный <strong>город</strong> и ваш <strong>стек</strong>, остальное мы сделаем сами ❤
+    </p>
+  </div>
+
+  <div class="col-md-10 mx-auto col-lg-5">
+    <form class="p-4 p-md-5 border rounded-4 bg-body-tertiary shadow-sm" action="{% url 'vacancies' %}" method="GET">
+      {% for field in form %}
+        <div class="form-floating mb-3">
+          {{ field }}
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {% if field.errors %}
+            <div class="text-danger small">{{ field.errors|join:", " }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <button class="w-100 btn btn-lg btn-primary" type="submit">Подобрать вакансии</button>
+      <hr class="my-4">
+      <small class="text-body-secondary">Это тестовый проект, все права <strong>защищены</strong>.</small>
+    </form>
+  </div>
 </div>
 {% endblock content %}
