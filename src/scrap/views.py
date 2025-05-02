@@ -1,5 +1,5 @@
 from django.core.paginator import Paginator
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpRequest
 from .models import Vacancy
 from .forms import FindVacancyForm
@@ -13,6 +13,9 @@ def main_view(request: HttpRequest):
 
 
 def vacancies_list_view(request: HttpRequest):
+    if not request.user.is_authenticated:
+        return redirect('accounts:login')
+
     city = request.GET.get("city")
     lang = request.GET.get("lang")
 
