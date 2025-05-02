@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Вход{% endblock title %}
+
+{% block content %}
+<main class="form-signin w-100 m-auto" style="max-width: 400px;">
+    <form method="POST" action="">
+        {% csrf_token %}
+        <h1 class="h3 mb-3 fw-normal text-center">Авторизация</h1>
+
+        <!-- Email -->
+        <div class="form-floating mb-3">
+            {{ form.email }}
+            <label for="{{ form.email.id_for_label }}">Email</label>
+        </div>
+
+        <!-- Пароль -->
+        <div class="form-floating mb-3">
+            {{ form.password }}
+            <label for="{{ form.password.id_for_label }}">Пароль</label>
+        </div>
+
+        <button class="btn btn-primary w-100 py-2" type="submit">Войти</button>
+        <p class="mt-5 mb-3 text-body-secondary text-center">© 2024–2025</p>
+    </form>
+</main>
+{% endblock content %}
