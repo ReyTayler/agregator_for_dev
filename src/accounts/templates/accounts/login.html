@@ -8,6 +8,15 @@
         {% csrf_token %}
         <h1 class="h3 mb-3 fw-normal text-center">Авторизация</h1>
 
+        <!-- Вывод общих ошибок формы -->
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <!-- Email -->
         <div class="form-floating mb-3">
             {{ form.email }}
@@ -21,6 +30,14 @@
         </div>
 
         <button class="btn btn-primary w-100 py-2" type="submit">Войти</button>
+
+        <!-- Ссылка на регистрацию -->
+        <div class="text-center mt-3">
+            <a href="{% url 'accounts:registration' %}" class="btn btn-outline-secondary w-100">
+                Зарегистрироваться
+            </a>
+        </div>
+
         <p class="mt-5 mb-3 text-body-secondary text-center">© 2024–2025</p>
     </form>
 </main>

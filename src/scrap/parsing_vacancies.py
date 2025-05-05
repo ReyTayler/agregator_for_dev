@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from random import choice
+import html
 
 domain_habr_career = "https://career.habr.com"
 domain_getmatch = "https://getmatch.ru"
@@ -42,6 +43,8 @@ def get_vacancies_habr(url_page: str, city=None, language=None):
                 company_div = div.find(name="div", class_="vacancy-card__company-title")
                 title_div = div.find(name="div", class_="vacancy-card__title")
 
+                salary = div.select_one(".vacancy-card__salary .basic-salary").get_text(strip=True)
+
                 title = title_div.a.string
                 href = title_div.a.get("href")
                 company = company_div.a.string
@@ -51,6 +54,7 @@ def get_vacancies_habr(url_page: str, city=None, language=None):
                     "title": title,
                     "url": domain_habr_career + href,
                     "company": company,
+                    "salary": salary,
                     "description": "Краткое описание не было предоставлено...",
                     "city_id": city,
                     "language_id": language
@@ -97,6 +101,13 @@ def get_vacancies_getmatch(url_page: str, city=None, language=None):
                 descriptions = description_div.find_all(name='p')
                 descriptions = [p.get_text() for p in descriptions]
 
+                # Извлекаем зарплату
+                salary_div = vacancy.find(name="div", class_="b-vacancy-card-subtitle__salary")
+                salary = salary_div.get_text(strip=True) if salary_div else "Зарплата не указана"
+
+                # Заменяем все сущности и невидимые символы
+                salary = html.unescape(salary)  # Преобразует все HTML-сущности в нормальные символы
+
                 main_text = str()
                 for description in descriptions:
                     if "Что делать:" in description:
@@ -108,6 +119,7 @@ def get_vacancies_getmatch(url_page: str, city=None, language=None):
                     "url": domain_getmatch + href,
                     "company": company,
                     "description": main_text,
+                    "salary": salary,
                     "city_id": city,
                     "language_id": language
                 }
@@ -146,19 +158,42 @@ def get_vacancies_hh(keyword: str = None, area: int = None, city=None, language=
         vacancies = data.get("items")
 
         if len(vacancies) > 0:
-            score = 0
             for vacancy in vacancies:
                 # Извлекаем данные о названии, компании, URL вакансии и кратком описании
                 title = vacancy["name"]
                 company = vacancy["employer"]["name"]
                 url = vacancy["alternate_url"]
-                description = vacancy['snippet']['responsibility']
 
+                raw_desc = vacancy.get("snippet", {}).get("responsibility") or ""
+                clean_desc = raw_desc.replace("<highlighttext>", "").replace("</highlighttext>", "")
+                clean_desc = html.unescape(clean_desc).strip()
+                description = clean_desc or "Описание не указано"
+
+                # Извлечение зарплаты из JSON
+                salary_data = vacancy.get("salary")
+                if salary_data:
+                    frm = salary_data.get("from")
+                    to = salary_data.get("to")
+                    currency = salary_data.get("currency", "")
+                    # Формируем строку: "100000–150000 RUB" или "от 100000 RUB" и т.п.
+                    if frm and to:
+                        salary = f"{frm}–{to} {currency}"
+                    elif frm:
+                        salary = f"от {frm} {currency}"
+                    elif to:
+                        salary = f"до {to} {currency}"
+                    else:
+                        salary = f"{currency}"
+                else:
+                    salary = "Не указано"
+
+                salary = salary.replace("RUR", "₽")
                 job = {
                     "title": title,
                     "url": url,
                     "company": company,
                     "description": description,
+                    "salary": salary,
                     "city_id": city,
                     "language_id": language
                 }

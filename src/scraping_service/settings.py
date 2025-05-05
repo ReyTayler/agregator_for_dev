@@ -120,3 +120,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Указываю кастомную модель пользователя как модель пользователя по умолчанию для всего проекта
 AUTH_USER_MODEL = 'accounts.ScrapUser'
+
+LOGIN_URL = '/accounts/login/'

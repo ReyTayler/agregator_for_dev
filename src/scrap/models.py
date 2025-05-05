@@ -47,6 +47,7 @@ class Vacancy(models.Model):
     description = models.TextField(verbose_name="Описание")
     city = models.ForeignKey("City", on_delete=models.CASCADE, verbose_name="Город")
     language = models.ForeignKey("Lang", on_delete=models.CASCADE, verbose_name="Язык программирования")
+    salary = models.CharField(max_length=100, verbose_name="Зарплата", blank=True, null=True)
     timestamp = models.DateField(auto_now_add=True)
 
     def __str__(self):

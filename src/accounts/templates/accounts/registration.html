@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Регистрация{% endblock title %}
+
+{% block content %}
+<main class="form-signin w-100 m-auto" style="max-width: 400px;">
+    <form method="POST" action="">
+        {% csrf_token %}
+        <h1 class="h3 mb-3 fw-normal text-center">Регистрация</h1>
+
+        <!-- Email -->
+        <div class="form-floating mb-3">
+            {{ form.email }}
+            <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+            {% if form.email.errors %}
+                <div class="text-danger small">
+                        <p>{{ form.email.errors }}</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Пароль 1 -->
+        <div class="form-floating mb-3">
+            {{ form.password1 }}
+            <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
+            {% if form.password1.errors %}
+                <div class="text-danger small">{{ form.password1.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Пароль 2 -->
+        <div class="form-floating mb-3">
+            {{ form.password2 }}
+            <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>
+            {% if form.password2.errors %}
+                <div class="text-danger small">{{ form.password2.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Чекбокс рассылки -->
+        <div class="form-check mb-3">
+            {{ form.is_send_email }}
+            <label class="form-check-label" for="{{ form.is_send_email.id_for_label }}">
+                {{ form.is_send_email.label }}
+            </label>
+            {% if form.is_send_email.errors %}
+                <div class="text-danger small">{{ form.is_send_email.errors }}</div>
+            {% endif %}
+        </div>
+
+        <button class="btn btn-primary w-100 py-2" type="submit">Зарегистрироваться</button>
+
+        <p class="mt-5 mb-3 text-body-secondary text-center">© 2024–2025</p>
+    </form>
+</main>
+{% endblock content %}

@@ -53,26 +53,32 @@ def get_user_preferences():
 
 
 def get_urls_for_users(user_preferences):
-    """Получает URL с сайтов вакансий для каждой уникальной пары предпочтений пользователей.
+    """
+    Возвращает список URL-адресов вакансий для каждой уникальной пары (город, язык)
+    из предпочтений пользователей.
 
     Args:
         user_preferences (set): Множество кортежей (city_id, language_id)
 
     Returns:
-        list: Список словарей с URL для каждого сочетания город-язык
+        list: Список словарей вида {"city": city_id, "language": language_id, "urls": [...]}
     """
+    # Загружаем все URL из базы и создаём сопоставление (city_id, language_id) -> urls
     all_urls = Url.objects.all().values()
     url_mapping = {
-        (url["city_id"], url["language_id"]): url["urls"] for url in all_urls
+        (item["city_id"], item["language_id"]): item["urls"]
+        for item in all_urls
     }
 
     urls_for_users = []
     for city_id, language_id in user_preferences:
-        urls_for_users.append({
-            "city": city_id,
-            "language": language_id,
-            "urls": url_mapping[(city_id, language_id)],
-        })
+        urls = url_mapping.get((city_id, language_id))
+        if urls:
+            urls_for_users.append({
+                "city": city_id,
+                "language": language_id,
+                "urls": urls,
+            })
 
     return urls_for_users
 
@@ -135,6 +141,9 @@ def main():
     user_preferences = get_user_preferences()
     urls_data = get_urls_for_users(user_preferences)
 
+    if urls_data == []:
+        return
+
     # Подготавливаем и запускаем асинхронные задачи
     tasks = prepare_tasks(urls_data)
     run_tasks(tasks)
@@ -142,7 +151,3 @@ def main():
     # Сохраняем результаты работы парсеров
     save_vacancies()
     save_errors()
-
-
-if __name__ == "__main__":
-    main()

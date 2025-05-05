@@ -1,98 +1,208 @@
 {% extends "base.html" %}
-{% block title %}Вакансии{% endblock title %}
+
+{% block title %}Вакансии{% endblock %}
 
 {% block content %}
+
+<style>
+  .card {
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  }
+  .pagination .page-item .page-link {
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+    border-radius: 0.25rem;
+  }
+
+  .pagination .page-item .page-link:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background-color: #e9ecef; /* чуть светлее фон на hover */
+  }
+
+  /* Активная страница — чуть большее выделение */
+  .pagination .page-item.active .page-link {
+    background-color: #0d6efd;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
+  }
+
+  .pagination .page-item.active .page-link:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 16px rgba(13, 110, 253, 0.6);
+  }
+  #scrollTopBtn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    display: none;
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 1.25rem;
+    z-index: 1000;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  #scrollTopBtn:hover {
+    transform: scale(1.1);
+    opacity: 0.85;
+  }
+</style>
+
 <div class="container py-4">
+  <div class="row">
+    <!-- Боковая панель -->
+    <div class="col-md-3 mb-4">
+      <div class="border p-4 rounded-4 shadow-sm bg-body-tertiary sticky-top" style="top: 20px;">
+        <h5 class="mb-3 text-center">
+          <i class="bi bi-funnel-fill me-2"></i>Фильтрация
+        </h5>
 
-    {% for object in object_list %}
-        <div class="card mb-4 shadow-sm border-0 rounded-4">
-            <div class="card-header bg-primary bg-gradient text-white d-flex justify-content-between align-items-center rounded-top-4">
-                <h5 class="mb-0 text-wrap">
-                    <a href="{{ object.url }}" target="_blank" class="text-white text-decoration-none">{{ object.title }}</a>
-                </h5>
-                <small class="text-light">{{ object.timestamp|date:"d.m.Y" }}</small>
-            </div>
-            <div class="card-body">
-                <h6 class="card-subtitle mb-2 text-muted">
-                    <i class="bi bi-building me-1"></i>{{ object.company }}
-                </h6>
-                <p class="card-text">{{ object.description|truncatewords:40 }}</p>
-                <a href="{{ object.url }}" target="_blank" class="btn btn-outline-primary btn-sm">
-                    Подробнее <i class="bi bi-box-arrow-up-right ms-1"></i>
-                </a>
-            </div>
-            <div class="card-footer text-muted text-end small fst-italic rounded-bottom-4">
-                <i class="bi bi-geo-alt-fill me-1"></i>{{ object.city }} •
-                <i class="bi bi-code-slash me-1"></i>{{ object.language }}
-            </div>
+        <!-- Фильтр по зарплате -->
+        <div class="mb-3">
+          <label for="salaryInput" class="form-label d-block">Зарплата:</label>
+          <input type="text" id="salaryInput" class="form-control" placeholder="От" value="{{ request.GET.min_salary }}">
         </div>
-    {% empty %}
-        <div class="alert alert-warning text-center">
-            <strong>Нет результатов.</strong> Вакансии по вашему запросу не найдены!
+        <!-- Чекбокс "Зарплата указана" -->
+        <div class="form-check form-switch mb-3">
+          <input class="form-check-input" type="checkbox" id="salarySpecified" name="salary_specified" {% if request.GET.salary_specified %}checked{% endif %}>
+          <label class="form-check-label" for="salarySpecified">
+            Только с указанной зарплатой
+          </label>
         </div>
-    {% endfor %}
+        <button class="btn btn-primary w-100 mt-2" onclick="applyFilter()">Применить фильтр</button>
+      </div>
+    </div>
 
-    {% if object_list %}
-        <nav aria-label="Пагинация">
-            <ul class="pagination justify-content-center mt-4">
-                {% if object_list.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" aria-label="Предыдущая" href="?page={{ object_list.previous_page_number }}&city={{ city }}&lang={{ lang }}">
-                            &laquo;
-                        </a>
-                    </li>
-                {% endif %}
-
-                {% for page_number in object_list.paginator.page_range %}
-                    {% if object_list.number == page_number %}
-                        <li class="page-item active">
-                            <span class="page-link">{{ page_number }}</span>
-                        </li>
-                    {% elif page_number >= object_list.number|add:'-2' and page_number <= object_list.number|add:'2' %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_number }}&city={{ city }}&lang={{ lang }}">{{ page_number }}</a>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-
-                {% if object_list.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" aria-label="Следующая" href="?page={{ object_list.next_page_number }}&city={{ city }}&lang={{ lang }}">
-                            &raquo;
-                        </a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
-    {% endif %}
-
-    <div class="row justify-content-center mt-5">
-  <div class="col-md-6">
-    <div class="border p-4 rounded-4 shadow-sm bg-body-tertiary">
-      <h5 class="mb-3 text-center">
-        <i class="bi bi-funnel-fill me-2"></i>Изменить параметры поиска
-      </h5>
-      <form method="GET" action="">
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary w-100">
-          <i class="bi bi-search me-1"></i>Повторить поиск
+    <!-- Список вакансий -->
+    <div class="col-md-9">
+      <!-- Кнопка "Обновить вакансии" -->
+      <form method="post" action="{% url 'vacancies' %}" class="d-flex justify-content-end mb-3">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-success">
+          <i class="bi bi-arrow-clockwise me-1"></i>Обновить вакансии
         </button>
       </form>
+
+      <div id="vacancyList">
+        {% for vacancy in object_list %}
+        <div class="card mb-4 shadow-sm border-0 rounded-4">
+          <div class="card-header bg-primary bg-gradient text-white d-flex justify-content-between align-items-center rounded-top-4">
+            <h5 class="mb-0 text-wrap">
+              <a href="{{ vacancy.url }}" target="_blank" class="text-white text-decoration-none">{{ vacancy.title }}</a>
+            </h5>
+            <small class="text-light">{{ vacancy.timestamp|date:"d.m.Y" }}</small>
+          </div>
+          <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-muted">
+              <i class="bi bi-building me-1"></i>{{ vacancy.company }}
+            </h6>
+            <h6 class="card-subtitle mb-2 text-muted">
+              <i class="bi bi-cash-stack me-1"></i>Зарплата: {{ vacancy.salary|default:"Не указана" }}
+            </h6>
+            <p class="card-text">{{ vacancy.description|truncatewords:40 }}</p>
+            <a href="{{ vacancy.url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+              Подробнее <i class="bi bi-box-arrow-up-right ms-1"></i>
+            </a>
+          </div>
+          <div class="card-footer text-muted text-end small fst-italic rounded-bottom-4">
+            <i class="bi bi-geo-alt-fill me-1"></i>{{ vacancy.city }} •
+            <i class="bi bi-code-slash me-1"></i>{{ vacancy.language }}
+          </div>
+        </div>
+        {% empty %}
+        <p>Нет вакансий, соответствующих фильтрам.</p>
+        {% endfor %}
+      </div>
+
+      <!-- Пагинация -->
+      {% if object_list.has_other_pages %}
+      <nav aria-label="Пагинация">
+        <ul class="pagination justify-content-center mt-4">
+          {% if object_list.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ object_list.previous_page_number }}{% if request.GET.min_salary %}&min_salary={{ request.GET.min_salary }}{% endif %}{% if city %}&city={{ city }}{% endif %}{% if lang %}&lang={{ lang }}{% endif %}{% if request.GET.salary_specified %}&salary_specified={{ request.GET.salary_specified }}{% endif %}">&laquo;</a>
+          </li>
+          {% else %}
+          <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+          {% endif %}
+
+          {% for num in object_list.paginator.page_range %}
+          {% if object_list.number == num %}
+          <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+          {% else %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ num }}{% if request.GET.min_salary %}&min_salary={{ request.GET.min_salary }}{% endif %}{% if city %}&city={{ city }}{% endif %}{% if lang %}&lang={{ lang }}{% endif %}{% if request.GET.salary_specified %}&salary_specified={{ request.GET.salary_specified }}{% endif %}">{{ num }}</a>
+          </li>
+          {% endif %}
+          {% endfor %}
+
+          {% if object_list.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ object_list.next_page_number }}{% if request.GET.min_salary %}&min_salary={{ request.GET.min_salary }}{% endif %}{% if city %}&city={{ city }}{% endif %}{% if lang %}&lang={{ lang }}{% endif %}{% if request.GET.salary_specified %}&salary_specified={{ request.GET.salary_specified }}{% endif %}">&raquo;</a>
+          </li>
+          {% else %}
+          <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
     </div>
   </div>
 </div>
+<!-- Кнопка "Наверх" -->
+<button id="scrollTopBtn" class="btn btn-primary" title="Наверх">
+  <i class="bi bi-arrow-up"></i>
+</button>
 
+<script>
+  function applyFilter() {
+  const salaryInput = document.getElementById('salaryInput').value;
+  const salarySpecified = document.getElementById('salarySpecified').checked;
 
-</div>
+  const urlParams = new URLSearchParams(window.location.search);
+  urlParams.set('min_salary', salaryInput);
 
-<style>
-    .card {
-        transition: transform 0.2s, box-shadow 0.2s;
+  if (salarySpecified) {
+    urlParams.set('salary_specified', '1');
+  } else {
+    urlParams.delete('salary_specified');
+  }
+
+  window.location.search = urlParams.toString();
+}
+</script>
+<script>
+  const salaryInput = document.getElementById('salaryInput');
+
+  salaryInput.addEventListener('input', function (e) {
+    // Удалить все, кроме цифр
+    let val = this.value.replace(/\D/g, '');
+    // Преобразовать в строку с пробелами
+    val = val.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    this.value = val;
+  });
+</script>
+<script>
+  // Получаем кнопку
+  const scrollBtn = document.getElementById('scrollTopBtn');
+
+  // Показываем кнопку после прокрутки вниз на 200px
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 200) {
+      scrollBtn.style.display = 'block';
+    } else {
+      scrollBtn.style.display = 'none';
     }
+  });
 
-    .card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-    }
-</style>
-{% endblock content %}
+  // По клику плавный скролл наверх
+  scrollBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
+{% endblock %}

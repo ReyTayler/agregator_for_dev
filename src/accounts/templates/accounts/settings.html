@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Настройки аккаунта{% endblock title %}
+
+{% block content %}
+<main class="form-signin w-100 m-auto" style="max-width: 400px;">
+  <form method="POST" action="">
+    {% csrf_token %}
+    <h1 class="h3 mb-3 fw-normal text-center">Настройки аккаунта</h1>
+
+    <!-- City -->
+    <div class="form-floating mb-3">
+      {{ form.city }}
+      <label for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
+      {% if form.city.errors %}
+        <div class="text-danger small">
+          {% for err in form.city.errors %}<p>{{ err }}</p>{% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Language -->
+    <div class="form-floating mb-3">
+      {{ form.language }}
+      <label for="{{ form.language.id_for_label }}">{{ form.language.label }}</label>
+      {% if form.language.errors %}
+        <div class="text-danger small">
+          {% for err in form.language.errors %}<p>{{ err }}</p>{% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Newsletter -->
+    <div class="form-check mb-3">
+      {{ form.is_send_email }}
+      <label class="form-check-label" for="{{ form.is_send_email.id_for_label }}">
+        {{ form.is_send_email.label }}
+      </label>
+      {% if form.is_send_email.errors %}
+        <div class="text-danger small">
+          {% for err in form.is_send_email.errors %}<p>{{ err }}</p>{% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <button class="btn btn-primary w-100 py-2" type="submit">Сохранить</button>
+  </form>
+</main>
+{% endblock content %}
