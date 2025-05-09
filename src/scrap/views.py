@@ -20,25 +20,40 @@ def parse_salary(salary_str: str) -> int:
     Возвращает верхнюю границу диапазона, если указано два значения.
 
     Примеры:
-        "50 000 — 100 000 ₽" -> 100000
-        "от 120 000 ₽" -> 120000
+        "8 300 — 10 100 $/мес на руки" -> 10100
+        "383 000 — 585 000 ₽/мес на руки" -> 585000
+        "от 300 000 ₽/мес на руки" -> 300000
+        "250000–400000 ₽" -> 400000
         "Не указана" -> 0
     """
-    # Удаляем все символы, кроме цифр, пробелов и дефиса
-    cleaned = re.sub(r'\D', '-', salary_str)
+    if not salary_str or "Не указана" in salary_str:
+        return 0
 
-    # Ищем все числа
-    numbers = re.findall(r'\d+', cleaned)
+    # Удаляем все символы, кроме цифр, пробелов, дефисов и тире
+    cleaned = re.sub(r'[^\d\s–—\-]', '', salary_str)
+
+    # Заменяем все разделители (дефисы, тире) на единый разделитель
+    normalized = re.sub(r'[–—\-]', '-', cleaned)
+
+    # Ищем все последовательности цифр (с возможными пробелами между ними)
+    numbers = re.findall(r'\d[\d\s]*\d|\d', normalized)
 
     if not numbers:
         return 0
 
-    # Если два числа (например, 50000–120000), возвращаем второе
-    if len(numbers) >= 2:
-        return int(numbers[1])
+    # Обрабатываем найденные числа - удаляем пробелы и преобразуем в int
+    processed_numbers = []
+    for num in numbers:
+        # Удаляем все пробелы между цифрами
+        num_clean = re.sub(r'\s', '', num)
+        processed_numbers.append(int(num_clean))
+
+    # Если два числа (диапазон), возвращаем второе
+    if len(processed_numbers) >= 2:
+        return processed_numbers[1]
 
     # Если только одно число
-    return int(numbers[0])
+    return processed_numbers[0]
 
 
 def vacancies_list_view(request: HttpRequest):
@@ -64,14 +79,6 @@ def vacancies_list_view(request: HttpRequest):
 
     if not request.user.is_authenticated:
         return redirect("accounts:login")
-
-    if request.method == "POST":
-        try:
-            main()
-            messages.success(request, "Вакансии успешно обновлены.")
-        except Exception as e:
-            messages.error(request, f"Ошибка при обновлении вакансий: {str(e)}")
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     # Параметры запроса
     city = request.GET.get("city")
