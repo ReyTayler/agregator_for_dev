@@ -80,14 +80,6 @@
 
     <!-- Список вакансий -->
     <div class="col-md-9">
-      <!-- Кнопка "Обновить вакансии" -->
-      <form method="post" action="{% url 'vacancies' %}" class="d-flex justify-content-end mb-3">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-outline-success">
-          <i class="bi bi-arrow-clockwise me-1"></i>Обновить вакансии
-        </button>
-      </form>
-
       <div id="vacancyList">
         {% for vacancy in object_list %}
         <div class="card mb-4 shadow-sm border-0 rounded-4">
