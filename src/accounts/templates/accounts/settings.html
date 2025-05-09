@@ -5,7 +5,7 @@
 <main class="form-signin w-100 m-auto" style="max-width: 400px;">
   <form method="POST" action="">
     {% csrf_token %}
-    <h1 class="h3 mb-3 fw-normal text-center">Настройки аккаунта</h1>
+    <h1 class="h3 mb-3 fw-normal text-center">Настройки аккаунта {{ user.email }}</h1>
 
     <!-- City -->
     <div class="form-floating mb-3">
