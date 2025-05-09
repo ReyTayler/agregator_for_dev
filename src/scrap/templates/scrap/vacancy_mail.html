@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        .vacancy-card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        .vacancy-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333333;
+        }
+        .vacancy-company {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 5px;
+        }
+        .vacancy-info {
+            font-size: 14px;
+            color: #444444;
+            margin-bottom: 10px;
+        }
+        .vacancy-link {
+            display: inline-block;
+            text-decoration: none;
+            color: #ffffff;
+            background-color: #007bff;
+            padding: 8px 12px;
+            border-radius: 5px;
+        }
+        .vacancy-link:hover {
+            background-color: #0056b3;
+        }
+        .footer {
+            font-size: 12px;
+            color: #888888;
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Привет, {{ user.email }}!</h2>
+        <p>Вот 5 свежих вакансий по вашим интересам:</p>
+
+        {% for vacancy in vacancies %}
+        <div class="vacancy-card">
+            <div class="vacancy-title">{{ vacancy.title }}</div>
+            <div class="vacancy-company">{{ vacancy.company }}</div>
+            <div class="vacancy-info">
+                Город: {{ vacancy.city.name }}<br>
+                Язык: {{ vacancy.language.name }}<br>
+                {% if vacancy.salary %}Зарплата: {{ vacancy.salary }}<br>{% endif %}
+            </div>
+            <a class="vacancy-link" href="{{ vacancy.url }}" target="_blank">Смотреть вакансию</a>
+        </div>
+        {% endfor %}
+
+        <div class="footer">
+            Вы получили это письмо, потому что подписались на рассылку. <br>
+            Если хотите отписаться — измените настройки в профиле.
+        </div>
+    </div>
+</body>
+</html>
