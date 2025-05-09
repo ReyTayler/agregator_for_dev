@@ -49,4 +49,4 @@ def account_settings_view(request):
     else:
         form = AccountSettingsForm(instance=request.user)
 
-    return render(request, 'accounts/settings.html', {'form': form})
+    return render(request, 'accounts/settings.html', {'form': form, 'user': request.user})
