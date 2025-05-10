@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <!-- Заголовок -->
+      <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold mb-3 gradient-text">AI Resume Assistant</h1>
+        <p class="lead text-muted-dark">Загрузите ваше резюме для профессионального анализа</p>
+      </div>
+
+      <!-- Основная карточка -->
+      <div class="card border-0 shadow-lg bg-card">
+        <div class="card-body p-4 p-md-5">
+          <form method="post" enctype="multipart/form-data" id="resumeDropzone">
+            {% csrf_token %}
+
+            <!-- Поле загрузки -->
+            <div class="mb-4">
+              <div class="file-upload-wrapper bg-upload-area">
+                <input type="file" name="pdf_file" id="pdf_file" class="form-control" accept=".pdf" required>
+                <div class="file-upload-label text-center">
+                  <i class="bi bi-cloud-arrow-up fs-1 text-primary mb-2"></i>
+                  <h5 class="mb-1">Перетащите PDF-файл</h5>
+                  <p class="small text-muted-dark">До 10MB</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Кнопка анализа -->
+            <button type="submit" class="btn btn-primary btn-lg w-100 py-3" id="analyzeBtn">
+              <span id="btnText">Анализировать резюме</span>
+              <span id="btnSpinner" class="spinner-border spinner-border-sm d-none"></span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Блок результатов -->
+      {% if response %}
+      <div class="card border-0 shadow-lg mt-4 bg-card animate__animated animate__fadeIn" id="resultCard">
+        <div class="card-header bg-primary-gradient py-3">
+          <h3 class="mb-0 text-white"><i class="bi bi-robot me-2"></i> Результат анализа</h3>
+        </div>
+        <div class="card-body">
+          <div class="ai-response">
+            {{ response|linebreaksbr }}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Базовые стили для светлого режима */
+  :root {
+    --bg-card: #ffffff;
+    --bg-upload-area: #f8f9fa;
+    --text-muted-dark: #6c757d;
+    --ai-response-bg: #f8f9fa;
+    --ai-response-text: #212529;
+    --border-color: #dee2e6;
+  }
+
+  /* Стили для темного режима */
+  [data-bs-theme="dark"] {
+    --bg-card: #2b3035;
+    --bg-upload-area: #343a40;
+    --text-muted-dark: #adb5bd;
+    --ai-response-bg: #343a40;
+    --ai-response-text: #f8f9fa;
+    --border-color: #495057;
+  }
+
+  /* Общие стили */
+  .gradient-text {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 700;
+  }
+
+  .bg-card {
+    background-color: var(--bg-card);
+    transition: background-color 0.3s ease;
+  }
+
+  .bg-upload-area {
+    background-color: var(--bg-upload-area);
+    border: 2px dashed var(--border-color);
+  }
+
+  .text-muted-dark {
+    color: var(--text-muted-dark) !important;
+  }
+
+  /* Стили для области загрузки */
+  .file-upload-wrapper {
+    position: relative;
+    border-radius: 0.5rem;
+    padding: 2.5rem 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .file-upload-wrapper:hover {
+    border-color: #3b82f6 !important;
+    background-color: rgba(59, 130, 246, 0.05) !important;
+  }
+
+  [data-bs-theme="dark"] .file-upload-wrapper:hover {
+    background-color: rgba(59, 130, 246, 0.1) !important;
+  }
+
+  #pdf_file {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  /* Стили для блока результатов */
+  .ai-response {
+    background-color: var(--ai-response-bg);
+    color: var(--ai-response-text);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    font-family: 'Courier New', Courier, monospace;
+    line-height: 1.7;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+  }
+
+  .bg-primary-gradient {
+    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%) !important;
+  }
+
+  /* Анимации */
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+  }
+
+  #resumeDropzone {
+    transition: transform 0.3s ease;
+  }
+
+  #resumeDropzone:hover {
+    transform: translateY(-2px);
+  }
+</style>
+
+<script>
+  // Инициализация темного режима
+  document.addEventListener('DOMContentLoaded', function() {
+    // Обработка загрузки файла
+    const fileInput = document.getElementById('pdf_file');
+    fileInput.addEventListener('change', function() {
+      if (this.files.length) {
+        const fileName = this.files[0].name;
+        const fileSize = (this.files[0].size / (1024 * 1024)).toFixed(2);
+
+        document.querySelector('.file-upload-label h5').innerHTML = `
+          <i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>
+          ${fileName}
+        `;
+        document.querySelector('.file-upload-label p').textContent = `${fileSize} MB`;
+      }
+    });
+
+    // Обработка формы
+    const form = document.getElementById('resumeDropzone');
+    form.addEventListener('submit', function() {
+      const btn = document.getElementById('analyzeBtn');
+      btn.disabled = true;
+      document.getElementById('btnText').textContent = 'Анализируем...';
+      document.getElementById('btnSpinner').classList.remove('d-none');
+    });
+
+    // Drag and drop
+    ['dragenter', 'dragover'].forEach(event => {
+      form.addEventListener(event, () => {
+        document.querySelector('.file-upload-wrapper').style.borderColor = '#3b82f6';
+        document.querySelector('.file-upload-wrapper').style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(event => {
+      form.addEventListener(event, () => {
+        document.querySelector('.file-upload-wrapper').style.borderColor = '';
+        document.querySelector('.file-upload-wrapper').style.backgroundColor = '';
+      });
+    });
+
+    form.addEventListener('drop', function(e) {
+      e.preventDefault();
+      fileInput.files = e.dataTransfer.files;
+      fileInput.dispatchEvent(new Event('change'));
+    });
+  });
+</script>
+{% endblock %}
