@@ -1,8 +1,8 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from django_apscheduler.jobstores import DjangoJobStore, register_events
-from django_apscheduler.models import DjangoJobExecution
 import logging
 
+from scrap.cleanup_vacancies import delete_old_vacancies
 from scrap.run_scraping import main
 from scrap.email_send import send_daily_vacancies
 
@@ -17,7 +17,7 @@ def start():
     scheduler.add_job(
         main,
         trigger="interval",
-        hours=12,
+        hours=3,
         id="vacancy_parser",
         replace_existing=True,
         name="Запуск парсинга вакансий",
@@ -27,12 +27,22 @@ def start():
     scheduler.add_job(
         send_daily_vacancies,
         trigger="interval",
-        hours=17,
+        minutes=15,
         id="daily_mailing_job",
         replace_existing=True,
         name="Рассылка вакансий",
     )
 
+    # Задача 3: Удаление вакансий, добавленных 14 дней назад каждые 24 часа
+    scheduler.add_job(
+        delete_old_vacancies,
+        trigger="interval",
+        hours=24,
+        id="delete_old_vacancies",
+        replace_existing=True,
+        name="Удаление старых вакансий (старше 14 дней)",
+        max_instances=1,
+    )
     register_events(scheduler)
     scheduler.start()
     logger.info("APScheduler запущен")
