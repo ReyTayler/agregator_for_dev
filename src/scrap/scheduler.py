@@ -27,7 +27,7 @@ def start():
     scheduler.add_job(
         send_daily_vacancies,
         trigger="interval",
-        minutes=15,
+        hours=17,
         id="daily_mailing_job",
         replace_existing=True,
         name="Рассылка вакансий",
