@@ -3,6 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
   <title>{% block title %}Главная{% endblock title %}</title>
 
   <!-- Установка темы до загрузки Bootstrap (предотвращает мигание) -->
@@ -25,8 +30,47 @@
     :root {
       --bs-primary-bg: #e3f2fd;
       --bs-footer-bg: #e3f2fd;
+      --font-primary: 'Manrope', sans-serif;  /* Для заголовков и акцентных элементов */
+      --font-secondary: 'Inter', sans-serif;  /* Для основного текста */
+    }
+    .navbar {
+      font-family: var(--font-secondary);
+      font-weight: 500;
     }
 
+    .navbar-brand {
+      font-family: var(--font-primary);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-link {
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      position: relative;
+      padding: 0.5rem 0.75rem !important;
+    }
+
+    .nav-link.active {
+      font-weight: 600;
+    }
+
+    /* Анимация подчеркивания для ссылок */
+    .nav-link:not(.btn):after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: currentColor;
+      transition: width 0.3s ease;
+    }
+
+    .nav-link:hover:not(.btn):after {
+      width: 60%;
+    }
     body {
       transition: background-color 0.3s, color 0.3s;
     }
@@ -40,14 +84,38 @@
         color-scheme: dark;
       }
     }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+
+    .navbar-brand:hover .gradient-text {
+      animation: gradient-shift 2s ease infinite;
+      background-size: 200% auto;
+    }
+
+    @keyframes gradient-shift {
+      0% { background-position: 0% center; }
+      50% { background-position: 100% center; }
+      100% { background-position: 0% center; }
+    }
   </style>
 </head>
 
 <body class="d-flex flex-column min-vh-100">
 <nav class="navbar navbar-expand-lg shadow-sm">
   <div class="container">
-    <a class="navbar-brand fs-4 text-primary" href="{% url 'main' %}">
-      <i class="bi bi-search"></i> Поиск
+    <a class="navbar-brand fs-4 text-primary d-flex align-items-center" href="{% url 'main' %}" style="font-family: 'Segoe UI', sans-serif;">
+      <span class="position-relative me-2">
+        <i class="bi bi-search-heart-fill" style="font-size: 1.3em;"></i>
+        <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" style="font-size: 0.4em;"></span>
+      </span>
+      <span class="gradient-text">JobGenius</span>
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Меню">
@@ -62,14 +130,19 @@
 
         {% if user.is_authenticated %}
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'accounts:settings' %}">Настройки аккаунта</a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}" href="{% url 'accounts:settings' %}" >Настройки аккаунта</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-primary btn-sm ms-2" href="{% url 'ai_chat:ai_analyze' %}">
+              <i class="bi bi-robot"></i> Анализ резюме
+            </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'accounts:logout' %}">Выйти</a>
           </li>
         {% else %}
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'accounts:login' %}">Войти</a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'accounts:login' %}">Войти</a>
           </li>
         {% endif %}
 
