@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_apscheduler',
     'scrap.apps.ScrapConfig',
-    'accounts.apps.AccountsConfig'
+    'accounts.apps.AccountsConfig',
+    'ai_chat.apps.AiChatConfig',
 ]
 
 MIDDLEWARE = [
