@@ -39,6 +39,12 @@ class Lang(models.Model):
         verbose_name_plural = "Языки программирования"
         verbose_name = "Язык программирования"
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+
+        super().save(*args, **kwargs)
+
 
 class Vacancy(models.Model):
     url = models.URLField(unique=True)
