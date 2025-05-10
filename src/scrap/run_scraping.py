@@ -5,8 +5,8 @@ from django.contrib.auth import get_user_model
 import asyncio
 
 # Настройка Django
-os.environ["DJANGO_SETTINGS_MODULE"] = "scraping_service.settings"
-django.setup()
+#os.environ["DJANGO_SETTINGS_MODULE"] = "scraping_service.settings"
+#django.setup()
 
 from scrap.parsing_vacancies import (
     get_vacancies_hh,
